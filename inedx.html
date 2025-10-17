@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web-Task-6</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+        body {
+            background-color: #404242;
+        }
+
+        .container{
+            font-family: Montserrat, sans-serif;
+            width: 260px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: rgb(139, 143, 143);
+            text-align: center;
+        }
+
+        input.input-form {
+            width: 100px;
+            border: 1px solid #C5C5C5;
+            border-radius: 2px;
+            padding: 10px;
+        }
+
+        select.custom-select {
+            background: #f0f0f0;
+            padding: 5px 30px 5px 10px;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .options, .properties {
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <label for="quantity">Введите количество товара:</label>
+        <input type="number" class="input-form" id="quantity" value="1" min="1">
+        <br>
+        <br>
+        <label>Выберите тип услуги:</label>
+        <div id="productTypes">
+            <label><input type="radio" name="productType" value="type1" checked>Тип 1</label>
+            <label><input type="radio" name="productType" value="type2">Тип 2</label>
+            <label><input type="radio" name="productType" value="type3">Тип 3</label>
+        </div>
+        
+        <div id="optionsContainer" class="options hidden">
+            <label for="productOptions">Выберите опцию:</label>
+            <select class="custom-select" id="productOptions">
+                <option value="option1">Опция 1 (+50 руб.)</option>
+                <option value="option2">Опция 2 (+100 руб.)</option>
+            </select>
+        </div>
+        <br>
+        <div id="propertiesContainer" class="properties hidden">
+            <label><input type="checkbox" id="productProperty" value="property1">Свойство (+75 руб.)</label>
+        </div>
+        <br>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const quantityInput = document.getElementById("quantity");
+        const productTypeRadios = document.querySelectorAll('input[name="productType"]');
+        const optionsContainer = document.getElementById("optionsContainer");
+        const productOptionsSelect = document.getElementById("productOptions");
+        const propertiesContainer = document.getElementById("propertiesContainer");
+        const productPropertyCheckbox = document.getElementById("productProperty");
+        const resultDiv = document.getElementById("result");
+
+        let currentProductType = "type1";
+
+        function updateOptionsAndProperties() {
+            optionsContainer.classList.add("hidden");
+            propertiesContainer.classList.add("hidden");
+
+            if (currentProductType === "type2") {
+                optionsContainer.classList.remove("hidden");
+            } else if (currentProductType === "type3") {
+                propertiesContainer.classList.remove("hidden");
+            }
+        }
+
+        productTypeRadios.forEach(radio => {
+            radio.addEventListener("change", function () {
+                currentProductType = this.value;
+                updateOptionsAndProperties();
+                calculatePrice(); 
+            });
+        });
+
+        function calculatePrice() {
+            const quantity = parseInt(quantityInput.value);
+
+            if (isNaN(quantity) || quantity <= 0) {
+                resultDiv.textContent = "Ошибка: Введите корректное количество.";
+                return;
+            }
+
+            let basePrice = 0;
+
+            if (currentProductType === "type1") {
+                basePrice = 100;
+            } else if (currentProductType === "type2") {
+                basePrice = 200;
+            } else if (currentProductType === "type3"){
+              basePrice = 300;
+            }
+
+            let additionalCost = 0;
+
+            if (currentProductType === "type2" && !optionsContainer.classList.contains("hidden")) {
+                const selectedOption = productOptionsSelect.value;
+                if (selectedOption === "option1") {
+                    additionalCost += 50;
+                } else if (selectedOption === "option2") {
+                    additionalCost += 100;
+                }
+            }
+            if (currentProductType === "type3" && !propertiesContainer.classList.contains("hidden")) {
+                if (productPropertyCheckbox.checked) {
+                    additionalCost += 75;
+                }
+            }
+
+            const totalPrice = quantity * (basePrice + additionalCost);
+            resultDiv.textContent = `Стоимость заказа: ${totalPrice} руб. (${basePrice}шт)`;
+        }
+
+        quantityInput.addEventListener("input", calculatePrice);
+        productOptionsSelect.addEventListener("change", calculatePrice);
+        productPropertyCheckbox.addEventListener("change", calculatePrice);
+
+        window.addEventListener('DOMContentLoaded', function () {
+            updateOptionsAndProperties();
+            calculatePrice(); 
+        });
+    </script>
+</body>
+
+</html>
+
+
+
+<!-- Разработать на JavaScript калькулятор стоимости услуги. Калькулятор должен содержать:
+
+- поле для ввода количества;
+
+- выбор типа(товара) услуги радиокнопкой (не менее 3-х вариантов);
+
+- выбор опции товара из списка (из двух и более вариантов);
+
+- выбор свойства товара чекбоксом.
+
+
+Опции и свойства товара зависят от выбранного типа товара и выводятся на форму
+динамически при смене типа товара:
+
+- первый тип товара не имеет дополнительных опций и свойств (селект и чекбокс не
+отображаются);
+
+- второй тип товара имеет только опции (селект отображается, чекбокс – нет);
+
+- третий тип товара имеет только свойство (селект не отображается, чекбокс отображается).
+
+В зависимости от количества, выбранного типа товара, выбранной опции или свойства
+динамически пересчитывается цена товара и выводится на странице без перезагрузки
+страницы при изменении значений элементов формы калькулятора. -->
+
+<!-- 
+-кол-во товара
+1 тип 2 тип 3 тип (радиокнопки)
+-Список товара
+-свойсва товра чекбокс 
+-->
